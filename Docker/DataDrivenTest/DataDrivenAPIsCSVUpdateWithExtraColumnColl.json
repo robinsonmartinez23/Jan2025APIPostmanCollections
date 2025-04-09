@@ -1,0 +1,144 @@
+{
+	"info": {
+		"_postman_id": "6d1919fb-9e92-4ef2-95b4-8c9cdaab3d25",
+		"name": "Day_08.5_DataDrivenAPIs_CSV UpdateWithExtraColumn",
+		"description": "**NOTE:** GoRestEnv\n\nRun Collection Manually concept\n\nRun Collection via CLI\n\n**NOTE:** options after passing collection: --verbose (logs), -r cli, -r html report, -r json, -r junit and simultaneous reports like -r cli,html,json separated by come **without** space as folow:\n\nNOTE: Option -d path of .csv or .json file",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "18249665"
+	},
+	"item": [
+		{
+			"name": "CreateWithTestData (myusersWithNewColumn.csv file)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Check user response data test\", function () {\r",
+							"    //Save response as json object of postman\r",
+							"    var jsonData = pm.response.json();\r",
+							"    //Validate these three files response vs data fields\r",
+							"    pm.expect(jsonData.name).to.eql(pm.iterationData.get(\"name\"));\r",
+							"    pm.expect(jsonData.gender).to.eql(pm.iterationData.get(\"gender\"));\r",
+							"    pm.expect(jsonData.status).to.eql(pm.iterationData.get(\"status\"));\r",
+							"    \r",
+							"    \r",
+							"    //Validate random email\r",
+							"\r",
+							"    //Get the raw JSON body from request body\r",
+							"    const rawJsonBody = pm.request.body.raw;\r",
+							"    //Convert JSON to JavaScript object\r",
+							"    const JSrequestuestBody = JSON.parse(rawJsonBody);\r",
+							"    //Get the JavaScript field \"email\"\r",
+							"    const randomEmail = JSrequestuestBody.email;\r",
+							"    //Print it out\r",
+							"    console.log(\"Expected emai l===> \"+ randomEmail);\r",
+							"    //Assertion email in body request vs email in respose \r",
+							"    pm.expect(jsonData.email).to.eql(randomEmail);\r",
+							"\r",
+							"});\r",
+							"\r",
+							"const response = pm.response.json();\r",
+							"const user_id = response.id;\r",
+							"console.log(\"user id ===> \"+ user_id);\r",
+							"//Local variable userID\r",
+							"pm.variables.set(\"userID\",user_id);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{tokenIDGoRest}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "//name, gender and status fetching from .csv file\r\n{\r\n    \"name\": \"{{name}}\",\r\n    \"gender\": \"{{gender}}\",\r\n    \"email\": \"{{$randomEmail}}\",\r\n    \"status\": \"{{status}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURLGoRest}}/public/v2/users/",
+					"host": [
+						"{{baseURLGoRest}}"
+					],
+					"path": [
+						"public",
+						"v2",
+						"users",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "UpdateUserByID (WithExtraColumnConcept)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Is user status updated\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.status).to.eql(pm.iterationData.get(\"newstatus\"));\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{tokenIDGoRest}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"status\": \"{{newstatus}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURLGoRest}}/public/v2/users/{{userID}}",
+					"host": [
+						"{{baseURLGoRest}}"
+					],
+					"path": [
+						"public",
+						"v2",
+						"users",
+						"{{userID}}"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

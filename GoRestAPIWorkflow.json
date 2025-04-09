@@ -1,0 +1,304 @@
+{
+	"info": {
+		"_postman_id": "9990c3a8-1538-441c-a7f5-526b436e624b",
+		"name": "GoRestAPIWorkflow",
+		"description": "**NOTE:** GoRestEnv\n\nRun Collection Manually concept\n\nRun Collection via CLI\n\n**NOTE:** options after passing collection: --verbose (logs), -r cli, -r html report, -r json, -r junit and simultaneous reports like -r cli,html,json separated by come **without** space as folow:  \n\npostman collection run 18249665-9990c3a8-1538-441c-a7f5-526b436e624b -e 18249665-72401315-6f3f-4ae2-9f72-98cc5529384c --verbose -r html,json\n\n- Log in con Google account a [https://gorest.co.in/](https://gorest.co.in/)\n    \n- Ve a \"REST console\" para ver como funcionan los http\n    \n- Alli tambien se encontrara el JWT Token \"Header Value\".\n    \n- El token tambien se encontrara en \"Howdy!\">\"API Tokens\"",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "18249665"
+	},
+	"item": [
+		{
+			"name": "1-GettAllUsers",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"//check status code is 200\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{tokenIDGoRest}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{baseURLGoRest}}/public/v2/users",
+					"host": [
+						"{{baseURLGoRest}}"
+					],
+					"path": [
+						"public",
+						"v2",
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "2-CreateAUser (random fields concept)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const response = pm.response.json();\r",
+							"const user_id = response.id;\r",
+							"console.log(\"user id ===> \"+ user_id);\r",
+							"//Local variable userID\r",
+							"pm.variables.set(\"userID\",user_id);\r",
+							"\r",
+							"//test case 201\r",
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"// test case status value\r",
+							"pm.test(\"Check status is active\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.status).to.eql(\"active\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{tokenIDGoRest}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "\r\n//The email is a unique field then instead of manually every single time then we create a random email\r\n//using {{$randomEmail}} but we can use random feature with many different fields\r\n{\r\n    \"name\": \"{{$randomUserName}}\",\r\n    \"gender\": \"male\",\r\n    \"email\": \"microsoft.{{$randomEmail}}\",\r\n    \"status\": \"active\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURLGoRest}}/public/v2/users/",
+					"host": [
+						"{{baseURLGoRest}}"
+					],
+					"path": [
+						"public",
+						"v2",
+						"users",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "3-GetUserByID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Check userID is correct\", function () {\r",
+							"    const newUserID = pm.variables.get(\"userID\");\r",
+							"    console.log(\"New User Id is: \"+newUserID);\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.id).to.eql(newUserID);\r",
+							"});\r",
+							"\r",
+							"// Adding a basic test for response time\r",
+							"pm.test(\"Response time is less than 500ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.lessThan(500);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{tokenIDGoRest}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{baseURLGoRest}}/public/v2/users/{{userID}}",
+					"host": [
+						"{{baseURLGoRest}}"
+					],
+					"path": [
+						"public",
+						"v2",
+						"users",
+						"{{userID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "4-UpdateAUserByID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response time is less than 500ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"New status should be inactive\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.status).to.eql(\"inactive\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{tokenIDGoRest}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"status\":\"inactive\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURLGoRest}}/public/v2/users/{{userID}}",
+					"host": [
+						"{{baseURLGoRest}}"
+					],
+					"path": [
+						"public",
+						"v2",
+						"users",
+						"{{userID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "5-DeleteAUserByID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code should be 204, User deleted\", function () {\r",
+							"    pm.response.to.have.status(204);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{tokenIDGoRest}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{baseURLGoRest}}/public/v2/users/{{userID}}",
+					"host": [
+						"{{baseURLGoRest}}"
+					],
+					"path": [
+						"public",
+						"v2",
+						"users",
+						"{{userID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "6-GetUserByID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code should de 404, Already deleted\", function () {\r",
+							"    pm.response.to.have.status(404);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{tokenIDGoRest}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{baseURLGoRest}}/public/v2/users/{{userID}}",
+					"host": [
+						"{{baseURLGoRest}}"
+					],
+					"path": [
+						"public",
+						"v2",
+						"users",
+						"{{userID}}"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

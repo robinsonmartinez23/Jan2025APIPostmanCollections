@@ -1,0 +1,17 @@
+[
+{
+    "name": "Tom",
+    "gender": "male",
+    "status": "active"
+},
+{
+    "name": "John",
+    "gender": "male",
+    "status": "active"
+},
+{
+    "name": "Bill",
+    "gender": "male",
+    "status": "inactive"
+}
+]
